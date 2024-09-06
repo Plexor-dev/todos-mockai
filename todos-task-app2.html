@@ -392,14 +392,14 @@
         const todoList = document.getElementById('todoList');
         let taskToDelete = null;
         let taskToEdit = null;
-
+    
         document.getElementById('todoInput').addEventListener('keypress', function(event) {
             if (event.key === 'Enter') {
                 event.preventDefault();
                 addTask();
             }
         });
-
+    
         function fetchTasks() {
             fetch(apiUrl)
                 .then(response => response.json())
@@ -420,44 +420,39 @@
                     });
                 });
         }
-//        
-
+    
         function applyAutocompletion(input) {
-        const value = input.value;
-        const cursorPos = input.selectionStart; // Obtener la posición del cursor
-
-        // Definir los atajos para autocompletar
-        const shortcuts = {
-            '<v': '<v></v>',
-            '<az': '<az></az>',
-            '<r': '<r></r>',
-            '<m': '<m></m>',
-            '<c': '<c></c>'
-        };
-
-        // Buscar si el usuario escribió un atajo
-        for (const [key, completion] of Object.entries(shortcuts)) {
-            if (value.endsWith(key)) {
-                const completedText = value.substring(0, cursorPos - key.length) + completion;
-                input.value = completedText;
-
-                // Mover el cursor dentro de las etiquetas
-                input.selectionStart = input.selectionEnd = cursorPos - key.length + completion.length - (completion.endsWith('</v>') ? 4 : 5);
-                break;
+            const value = input.value;
+            const cursorPos = input.selectionStart;
+    
+            const shortcuts = {
+                '<v': '<v></v>',
+                '<az': '<az></az>',
+                '<r': '<r></r>',
+                '<m': '<m></m>',
+                '<c': '<c></c>'
+            };
+    
+            for (const [key, completion] of Object.entries(shortcuts)) {
+                if (value.endsWith(key)) {
+                    const completedText = value.substring(0, cursorPos - key.length) + completion;
+                    input.value = completedText;
+                    input.selectionStart = input.selectionEnd = cursorPos - key.length + completion.length - (completion.endsWith('</v>') ? 4 : 5);
+                    break;
+                }
             }
         }
-    }
-
-    document.getElementById('todoInput').addEventListener('input', function(e) {
-        applyAutocompletion(e.target);
-    });
-
-    document.getElementById('editInput').addEventListener('input', function(e) {
-    applyAutocompletion(e.target);
-    autoResizeTextarea(this);
-});
-
-    function showEditModal(id) {
+    
+        document.getElementById('todoInput').addEventListener('input', function(e) {
+            applyAutocompletion(e.target);
+        });
+    
+        document.getElementById('editInput').addEventListener('input', function(e) {
+            applyAutocompletion(e.target);
+            autoResizeTextarea(this);
+        });
+    
+        function showEditModal(id) {
             taskToEdit = id;
             fetch(`${apiUrl}/${id}`)
                 .then(response => response.json())
@@ -466,34 +461,29 @@
                     editInput.value = task.text;
                     document.getElementById('editModal').style.display = 'flex';
                     autoResizeTextarea(editInput);
-                    
-                    // Establecer el foco en el textarea y mover el cursor al final
                     editInput.focus();
                     editInput.selectionStart = editInput.selectionEnd = editInput.value.length;
                 });
         }
-
-//
-
-
+    
         function formatText(text) {
             return text
                 .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
                 .replace(/\/\/(.*?)\/\//g, '<em>$1</em>')
                 .replace(/\[(.*?)\]/g, '<u>$1</u>')
                 .replace(/\{(.*?)\}/g, '<span style="color: orange;">$1</span>')
-                .replace(/<v>(.*?)<\/v>/g, '<span class="verde">$1</span>')   // Verde
-                .replace(/<az>(.*?)<\/az>/g, '<span class="azul">$1</span>')   // Azul
-                .replace(/<r>(.*?)<\/r>/g, '<span class="rojo">$1</span>')     // Rojo
-                .replace(/<m>(.*?)<\/m>/g, '<span class="morado">$1</span>')   // Morado
-                .replace(/<c>(.*?)<\/c>/g, '<span class="cyan">$1</span>');    // Cyan
+                .replace(/<v>(.*?)<\/v>/g, '<span class="verde">$1</span>')
+                .replace(/<az>(.*?)<\/az>/g, '<span class="azul">$1</span>')
+                .replace(/<r>(.*?)<\/r>/g, '<span class="rojo">$1</span>')
+                .replace(/<m>(.*?)<\/m>/g, '<span class="morado">$1</span>')
+                .replace(/<c>(.*?)<\/c>/g, '<span class="cyan">$1</span>');
         }
-
+    
         function addTask() {
             const input = document.getElementById('todoInput');
             const text = input.value.trim();
             if (!text) return;
-
+    
             fetch(apiUrl, {
                 method: 'POST',
                 headers: {
@@ -506,7 +496,7 @@
                 fetchTasks();
             });
         }
-
+    
         function toggleTaskCompletion(id) {
             fetch(`${apiUrl}/${id}`)
                 .then(response => response.json())
@@ -521,7 +511,7 @@
                     .then(() => fetchTasks());
                 });
         }
-
+    
         function confirmEdit() {
             const newText = document.getElementById('editInput').value.trim();
             if (newText && taskToEdit !== null) {
@@ -538,16 +528,16 @@
                 });
             }
         }
-
+    
         function showDeleteModal(id) {
             taskToDelete = id;
             document.getElementById('deleteModal').style.display = 'flex';
         }
-
+    
         function closeModal(modalId) {
             document.getElementById(modalId).style.display = 'none';
         }
-
+    
         document.getElementById('confirmDelete').addEventListener('click', function() {
             if (taskToDelete !== null) {
                 fetch(`${apiUrl}/${taskToDelete}`, { method: 'DELETE' })
@@ -555,12 +545,12 @@
                     .finally(() => closeModal('deleteModal'));
             }
         });
-
+    
         function toggleMenu() {
             const menuContent = document.querySelector('.menu-content');
             menuContent.style.display = menuContent.style.display === 'block' ? 'none' : 'block';
         }
-
+    
         function copyTaskText(text) {
             navigator.clipboard.writeText(text).then(() => {
                 alert('Task text copied to clipboard!');
@@ -568,17 +558,20 @@
                 console.error('Failed to copy text: ', err);
             });
         }
-
+    
         function autoResizeTextarea(textarea) {
             textarea.style.height = 'auto';
             textarea.style.height = textarea.scrollHeight + 'px';
         }
-
+    
         document.getElementById('editInput').addEventListener('input', function() {
             autoResizeTextarea(this);
         });
-
+    
+        // Polling cada 5 segundos (5000 milisegundos)
+        setInterval(fetchTasks, 5000);
+    
         fetchTasks();
-    </script>
+    </script>    
 </body>
 </html>
