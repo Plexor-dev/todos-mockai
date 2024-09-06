@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TODO App</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            margin: 0;
+            background-color: #1e1e1e;
+            color: #ffffff;
+            font-size: 16px;
+        }
+        .container {
+            width: 100%;
+            max-width: 600px;
+            background: #2d2d2d;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            padding: 20px;
+            box-sizing: border-box;
+            margin-left: 60px;
+        }
+        .menu {
+            width: 60px;
+            background: #3a3a3a;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+        }
+        .menu button {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        .menu button:hover {
+            color: #007bff;
+        }
+        .menu-content {
+            display: none;
+            background: #2d2d2d;
+            color: #ffffff;
+            border-radius: 8px;
+            padding: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            position: absolute;
+            top: 60px;
+            left: 0;
+            width: 200px;
+        }
+        .menu-content p {
+            margin: 0;
+            font-size: 18px;
+        }
+        .menu-content span {
+            display: block;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        .menu-content span:hover {
+            color: #007bff;
+        }
+        .menu-button {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+        }
+        .menu-button div {
+            width: 30px;
+            height: 4px;
+            background: white;
+            margin: 4px 0;
+            border-radius: 2px;
+        }
+        .todo-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .todo-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #444;
+            transition: background-color 0.3s, opacity 0.3s;
+            cursor: default;
+            text-wrap: pretty;
+            max-width: 900px; /* Ajusta este valor según tus necesidades */
+            white-space: normal;
+            text-overflow: ellipsis;
+            overflow: auto;
+        }   
+
+
+
+        .todo-item.completed {
+            background-color: #2a3a2a;
+            opacity: 0.6;
+        }
+        .todo-item .icon {
+            background-color: #ffd700;
+            border-radius: 50%;
+            color: black;
+            font-size: 18px;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .todo-item .icon:hover {
+            background-color: #ffc107;
+        }
+        .todo-item.completed .icon {
+            background-color: #4caf50;
+            color: white;
+            text-decoration: line-through;
+        }
+        .todo-item.completed .icon:hover {
+            background-color: #388e3c;
+        }
+        .todo-item button {
+            background: none;
+            border: none;
+            color: #ff6b6b;
+            cursor: pointer;
+            font-size: 18px;
+            margin-left: 10px;
+        }
+        .todo-item button:hover {
+            color: #ff4757;
+        }
+        .add-todo {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        .add-todo input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #444;
+            border-radius: 4px;
+            background-color: #3a3a3a;
+            color: #ffffff;
+        }
+        .add-todo button {
+            padding: 10px;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+        .add-todo button:hover {
+            background-color: #0056b3;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+        .modal-content {
+            background: #2d2d2d;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+            width: 90%;
+            max-width: 400px;
+            position: relative;
+        }
+        .modal-content button {
+            background: #007bff;
+            color: #fff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        .modal-content button.cancel {
+            background: #555;
+        }
+        .modal-content button:hover {
+            background: #0056b3;
+        }
+        .modal-content button.cancel:hover {
+            background: #444;
+        }
+        .modal-content .modal-close {
+            background: none;
+            border: none;
+            color: #ff6b6b;
+            font-size: 24px;
+            cursor: pointer;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+        .copy-button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+            color: #007bff;
+            margin-left: 10px;
+        }
+        .copy-button:hover {
+            color: #0056b3;
+        }
+        #editModal .modal-content {
+            display: flex;
+            flex-direction: column;
+        }
+        #editModal textarea {
+            margin-bottom: 15px;
+            padding: 10px;
+            border: 1px solid #444;
+            border-radius: 4px;
+            background-color: #3a3a3a;
+            color: #ffffff;
+            min-height: 100px;
+            resize: vertical;
+            font-family: Arial, sans-serif;
+        }
+        #editModal .button-group {
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        /* Media queries para pantallas más grandes */
+        @media screen and (min-width: 768px) {
+            body {
+                font-size: 18px;
+            }
+            .container {
+                max-width: 800px;
+                padding: 30px;
+                margin-left: 80px;
+            }
+            .menu {
+                width: 80px;
+            }
+            .menu-content {
+                width: 250px;
+            }
+            .todo-item {
+                padding: 15px;
+            }
+            .todo-item .icon {
+                font-size: 24px;
+                width: 32px;
+                height: 32px;
+            }
+            .add-todo input {
+                padding: 15px;
+                font-size: 18px;
+            }
+            .add-todo button {
+                padding: 15px 20px;
+                font-size: 18px;
+            }
+            .modal-content {
+                max-width: 600px;
+                padding: 30px;
+            }
+            #editModal textarea {
+                min-height: 150px;
+                font-size: 18px;
+            }
+        }
+
+        @media screen and (min-width: 1024px) {
+            body {
+                font-size: 20px;
+            }
+            .container {
+                max-width: 1000px;
+            }
+            .menu {
+                width: 100px;
+            }
+            .menu-content {
+                width: 300px;
+            }
+            .todo-item .icon {
+                font-size: 28px;
+                width: 36px;
+                height: 36px;
+            }
+            .add-todo input {
+                padding: 20px;
+                font-size: 20px;
+            }
+            .add-todo button {
+                padding: 20px 25px;
+                font-size: 20px;
+            }
+            .modal-content {
+                max-width: 800px;
+            }
+            #editModal textarea {
+                min-height: 200px;
+                font-size: 20px;
+            }
+        }
+
+        .verde { color: #4CAF50; }
+        .azul { color: #2196F3; }
+        .rojo { color: #F44336; }
+        .morado { color: #9C27B0; }
+        .cyan { color: #00BCD4; }
+    </style>
+</head>
+<body>
+    <div class="menu">
+        <div class="menu-button" onclick="toggleMenu()">
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+        <div class="menu-content">
+            <p><strong>Cómo funciona la aplicación:</strong></p>
+            <p>1. Agrega nuevas tareas usando el campo de texto y el botón "Add" o presionando Enter.</p>
+            <p>2. Marca las tareas como completadas haciendo clic en el ícono ✔️, el cual cambiará a verde y tachado.</p>
+            <p>3. Edita tareas haciendo clic en el botón ✏️ y elimina tareas con el botón ❌.</p>
+            <p><strong>Uso de colores en el texto:</strong></p>
+            <p><span style="color: blue;">**Negrita**</span></p>
+            <p><span style="color: red;">//Cursiva//</span></p>
+            <p><span style="color: green;">[Subrayado]</span></p>
+            <p><span style="color: orange;">{Color Naranja}</span></p>
+            <p><span class="verde">&lt;v&gt;Texto en verde&lt;/v&gt;</span></p>
+            <p><span class="azul">&lt;az&gt;Texto en azul&lt;/az&gt;</span></p>
+            <p><span class="rojo">&lt;r&gt;Texto en rojo&lt;/r&gt;</span></p>
+            <p><span class="morado">&lt;m&gt;Texto en morado&lt;/m&gt;</span></p>
+            <p><span class="cyan">&lt;c&gt;Texto en cyan&lt;/c&gt;</span></p>
+        </div>
+        
+    </div>
+    <div class="container">
+        <h1>TODO App</h1>
+        <div class="add-todo">
+            <input type="text" id="todoInput" placeholder="Add a new task" />
+            <button onclick="addTask()">Add</button>
+        </div>
+        <ul id="todoList" class="todo-list"></ul>
+    </div>
+
+    <div id="deleteModal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('deleteModal')">×</button>
+            <p>Are you sure you want to delete this task?</p>
+            <button id="confirmDelete">Yes</button>
+            <button class="cancel" onclick="closeModal('deleteModal')">No</button>
+        </div>
+    </div>
+
+    <div id="editModal" class="modal">
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal('editModal')">×</button>
+            <h2>Edit Task</h2>
+            <textarea id="editInput" placeholder="Edit your task"></textarea>
+            <div class="button-group">
+                <button onclick="confirmEdit()">Save</button>
+                <button class="cancel" onclick="closeModal('editModal')">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const apiUrl = 'https://66db1f4ef47a05d55be72212.mockapi.io/todos/todos';
+        const todoList = document.getElementById('todoList');
+        let taskToDelete = null;
+        let taskToEdit = null;
+
+        document.getElementById('todoInput').addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                event.preventDefault();
+                addTask();
+            }
+        });
+
+        function fetchTasks() {
+            fetch(apiUrl)
+                .then(response => response.json())
+                .then(tasks => {
+                    todoList.innerHTML = '';
+                    tasks.forEach(task => {
+                        const li = document.createElement('li');
+                        li.className = `todo-item${task.completed ? ' completed' : ''}`;
+                        li.dataset.id = task.id;
+                        li.innerHTML = `
+                            <span class="icon${task.completed ? ' completed' : ''}" onclick="toggleTaskCompletion(${task.id})">✔️</span>
+                            <span class="task-text">${formatText(task.text)}</span>
+                            <button onclick="showEditModal(${task.id})">✏️</button>
+                            <button onclick="showDeleteModal(${task.id})">❌</button>
+                            <button class="copy-button" onclick="copyTaskText('${task.text}')">📋</button>
+                        `;
+                        todoList.appendChild(li);
+                    });
+                });
+        }
+//        
+
+        function applyAutocompletion(input) {
+        const value = input.value;
+        const cursorPos = input.selectionStart; // Obtener la posición del cursor
+
+        // Definir los atajos para autocompletar
+        const shortcuts = {
+            '<v': '<v></v>',
+            '<az': '<az></az>',
+            '<r': '<r></r>',
+            '<m': '<m></m>',
+            '<c': '<c></c>'
+        };
+
+        // Buscar si el usuario escribió un atajo
+        for (const [key, completion] of Object.entries(shortcuts)) {
+            if (value.endsWith(key)) {
+                const completedText = value.substring(0, cursorPos - key.length) + completion;
+                input.value = completedText;
+
+                // Mover el cursor dentro de las etiquetas
+                input.selectionStart = input.selectionEnd = cursorPos - key.length + completion.length - (completion.endsWith('</v>') ? 4 : 5);
+                break;
+            }
+        }
+    }
+
+    document.getElementById('todoInput').addEventListener('input', function(e) {
+        applyAutocompletion(e.target);
+    });
+
+    document.getElementById('editInput').addEventListener('input', function(e) {
+    applyAutocompletion(e.target);
+    autoResizeTextarea(this);
+});
+
+    function showEditModal(id) {
+            taskToEdit = id;
+            fetch(`${apiUrl}/${id}`)
+                .then(response => response.json())
+                .then(task => {
+                    const editInput = document.getElementById('editInput');
+                    editInput.value = task.text;
+                    document.getElementById('editModal').style.display = 'flex';
+                    autoResizeTextarea(editInput);
+                    
+                    // Establecer el foco en el textarea y mover el cursor al final
+                    editInput.focus();
+                    editInput.selectionStart = editInput.selectionEnd = editInput.value.length;
+                });
+        }
+
+//
+
+
+        function formatText(text) {
+            return text
+                .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+                .replace(/\/\/(.*?)\/\//g, '<em>$1</em>')
+                .replace(/\[(.*?)\]/g, '<u>$1</u>')
+                .replace(/\{(.*?)\}/g, '<span style="color: orange;">$1</span>')
+                .replace(/<v>(.*?)<\/v>/g, '<span class="verde">$1</span>')   // Verde
+                .replace(/<az>(.*?)<\/az>/g, '<span class="azul">$1</span>')   // Azul
+                .replace(/<r>(.*?)<\/r>/g, '<span class="rojo">$1</span>')     // Rojo
+                .replace(/<m>(.*?)<\/m>/g, '<span class="morado">$1</span>')   // Morado
+                .replace(/<c>(.*?)<\/c>/g, '<span class="cyan">$1</span>');    // Cyan
+        }
+
+        function addTask() {
+            const input = document.getElementById('todoInput');
+            const text = input.value.trim();
+            if (!text) return;
+
+            fetch(apiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ text, completed: false }),
+            })
+            .then(() => {
+                input.value = '';
+                fetchTasks();
+            });
+        }
+
+        function toggleTaskCompletion(id) {
+            fetch(`${apiUrl}/${id}`)
+                .then(response => response.json())
+                .then(task => {
+                    fetch(`${apiUrl}/${id}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ ...task, completed: !task.completed }),
+                    })
+                    .then(() => fetchTasks());
+                });
+        }
+
+        function confirmEdit() {
+            const newText = document.getElementById('editInput').value.trim();
+            if (newText && taskToEdit !== null) {
+                fetch(`${apiUrl}/${taskToEdit}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ text: newText }),
+                })
+                .then(() => {
+                    closeModal('editModal');
+                    fetchTasks();
+                });
+            }
+        }
+
+        function showDeleteModal(id) {
+            taskToDelete = id;
+            document.getElementById('deleteModal').style.display = 'flex';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        document.getElementById('confirmDelete').addEventListener('click', function() {
+            if (taskToDelete !== null) {
+                fetch(`${apiUrl}/${taskToDelete}`, { method: 'DELETE' })
+                    .then(() => fetchTasks())
+                    .finally(() => closeModal('deleteModal'));
+            }
+        });
+
+        function toggleMenu() {
+            const menuContent = document.querySelector('.menu-content');
+            menuContent.style.display = menuContent.style.display === 'block' ? 'none' : 'block';
+        }
+
+        function copyTaskText(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Task text copied to clipboard!');
+            }).catch(err => {
+                console.error('Failed to copy text: ', err);
+            });
+        }
+
+        function autoResizeTextarea(textarea) {
+            textarea.style.height = 'auto';
+            textarea.style.height = textarea.scrollHeight + 'px';
+        }
+
+        document.getElementById('editInput').addEventListener('input', function() {
+            autoResizeTextarea(this);
+        });
+
+        fetchTasks();
+    </script>
+</body>
+</html>
