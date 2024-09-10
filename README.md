@@ -30,7 +30,7 @@ La aplicación se encuentra en un solo archivo `.html`, incluyendo el estilo y e
 
 1. Clona este repositorio:
    ```bash
-   git clone 
+   git clone https://github.com/Plexor-dev/todos-mockai.git
    ```
 2. Abre el archivo `todos-task-app2.html` en tu navegador.
 3. La aplicación se conecta automáticamente a la API de MockApi para gestionar las tareas.
